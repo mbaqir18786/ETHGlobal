@@ -1,0 +1,227 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "HexFence Threat Intelligence & Poisoning Defense API",
+    "version": "0.1.0",
+    "description": "Backend API for Ethereum Address-Poisoning Defense, Arkiv Evidence Ingestion, Community Reporting, and Multi-Sig Protection."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "System Health & Database Connection",
+        "responses": {
+          "200": { "description": "Service is healthy and database is connected" }
+        }
+      }
+    },
+    "/api/investigate": {
+      "get": {
+        "summary": "Investigate Ethereum Wallet or Contract Address",
+        "description": "Validates Ethereum format, checks Arkiv evidence records, counts associated lookalikes, and returns verified relationships.",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "example": "0xd9A1C3C6f3590059B2E3516A6ea0ADa244853a91" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Investigation completed" },
+          "400": { "description": "Invalid Ethereum address format" }
+        }
+      }
+    },
+    "/api/evidence": {
+      "get": {
+        "summary": "Retrieve Threat Evidence Records",
+        "description": "Paginated list of confirmed and under-review vanity poisoning incidents anchored to Arkiv.",
+        "parameters": [
+          { "name": "address", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["SUSPECTED", "UNDER_REVIEW", "CONFIRMED_BY_REVIEW", "FALSE_POSITIVE", "ALL"] } },
+          { "name": "token", "in": "query", "schema": { "type": "string" } },
+          { "name": "reason", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": {
+          "200": { "description": "Filtered evidence records" }
+        }
+      }
+    },
+    "/api/evidence/{id}": {
+      "get": {
+        "summary": "Get Evidence Record by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Evidence details and Arkiv proof receipt" },
+          "404": { "description": "Evidence not found" }
+        }
+      }
+    },
+    "/api/reports": {
+      "post": {
+        "summary": "Submit a Community Threat Report",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["submittedAddress", "description"],
+                "properties": {
+                  "submittedAddress": { "type": "string", "example": "0xd9A1C3C6f3590059B2E3516A6ea0ADa244853a91" },
+                  "relatedAddress": { "type": "string", "example": "0xd9A1c3788D81257612E2581A6ea0aDa244853a91" },
+                  "txHash": { "type": "string" },
+                  "tokenContract": { "type": "string", "example": "USDT" },
+                  "description": { "type": "string", "example": "Received dust transfer from lookalike" },
+                  "supportingEvidence": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Report created and queued for review" },
+          "400": { "description": "Validation error" }
+        }
+      },
+      "get": {
+        "summary": "Query Community Reports",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          { "name": "isDispute", "in": "query", "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": { "description": "List of submitted reports" }
+        }
+      }
+    },
+    "/api/reports/false-positive": {
+      "post": {
+        "summary": "Submit a False Positive Dispute",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["address", "reason"],
+                "properties": {
+                  "address": { "type": "string" },
+                  "reason": { "type": "string" },
+                  "evidenceReference": { "type": "string" },
+                  "contactEmail": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Dispute queued for security review" },
+          "400": { "description": "Validation error" }
+        }
+      }
+    },
+    "/api/admin/evidence": {
+      "get": {
+        "summary": "Administrative Evidence Queue (Dev-Only)",
+        "security": [{ "DevAdminAuth": [] }],
+        "responses": {
+          "200": { "description": "All evidence records" },
+          "403": { "description": "Dev admin access required" }
+        }
+      }
+    },
+    "/api/admin/evidence/{id}": {
+      "patch": {
+        "summary": "Update Evidence Review Status (Dev-Only)",
+        "security": [{ "DevAdminAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status", "reviewNotes"],
+                "properties": {
+                  "status": { "type": "string", "enum": ["SUSPECTED", "UNDER_REVIEW", "CONFIRMED_BY_REVIEW", "FALSE_POSITIVE"] },
+                  "reviewNotes": { "type": "string" },
+                  "reviewerId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Evidence status updated" }
+        }
+      }
+    },
+    "/api/admin/audit-logs": {
+      "get": {
+        "summary": "Retrieve System Audit Logs (Dev-Only)",
+        "security": [{ "DevAdminAuth": [] }],
+        "responses": {
+          "200": { "description": "Audit log events" }
+        }
+      }
+    },
+    "/api/preferences": {
+      "get": {
+        "summary": "Get User Notification Preferences",
+        "parameters": [
+          { "name": "user", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "User preferences" }
+        }
+      },
+      "put": {
+        "summary": "Update Notification Preference",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userReference", "notificationType", "enabled", "destination"],
+                "properties": {
+                  "userReference": { "type": "string" },
+                  "notificationType": { "type": "string", "enum": ["EMAIL", "IVR_PHONE", "BROWSER_PUSH", "WEBHOOK"] },
+                  "enabled": { "type": "boolean" },
+                  "destination": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Preference updated" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "DevAdminAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-hexfence-dev-admin",
+        "description": "Development testing bypass header. Pass 'x-hexfence-dev-admin: true' or 'Authorization: Bearer <DEV_ADMIN_TOKEN>'."
+      }
+    }
+  }
+}
+

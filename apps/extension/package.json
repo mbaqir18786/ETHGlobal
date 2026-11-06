@@ -1,0 +1,20 @@
+{
+  "name": "@hexfence/extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HexFence Manifest V3 Chrome Extension for real-time recipient poisoning protection on Safe",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsx --test test/extension.test.ts"
+  },
+  "dependencies": {
+    "@hexfence/shared": "*",
+    "viem": "^2.21.57"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.266",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.4.5",
+    "tsx": "^4.7.2"
+  }
+}

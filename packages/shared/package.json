@@ -1,0 +1,19 @@
+{
+  "name": "@hexfence/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared types, domain models, and schemas for HexFence",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
+

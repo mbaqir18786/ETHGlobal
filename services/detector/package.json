@@ -1,0 +1,23 @@
+{
+  "name": "@hexfence/detector",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Algorithmic address-poisoning detection engine",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "test": "tsx --test test/detector.test.ts",
+    "benchmark": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@hexfence/shared": "*",
+    "@types/node": "^20.19.43",
+    "tsx": "^4.23.15",
+    "viem": "^2.57.16"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

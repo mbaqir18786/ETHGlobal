@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "HexFence — Safe Address-Poisoning Guard",
+  "version": "1.0.0",
+  "description": "On-device transaction guard for Safe on Sepolia. Detects vanity address-poisoning lookalikes locally without sending recipients to external servers.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "windows",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://app.safe.global/*",
+    "http://localhost:*/*"
+  ],
+  "background": {
+    "service_worker": "dist/background/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.safe.global/*",
+        "http://localhost:*/*"
+      ],
+      "js": [
+        "dist/content/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "HexFence Safe Guard"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "warning.html",
+        "dist/ui/warning.js"
+      ],
+      "matches": [
+        "https://app.safe.global/*",
+        "http://localhost:*/*"
+      ]
+    }
+  ]
+}

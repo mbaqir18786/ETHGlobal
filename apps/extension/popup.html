@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HexFence Safe Guard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 360px;
+      background: #F4F2EC;
+      color: #151515;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      padding: 14px;
+      user-select: none;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #151515;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .logo {
+      font-weight: 900;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lang-switcher select {
+      background: #151515;
+      color: #C6F36B;
+      border: 1px solid #151515;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      font-family: monospace;
+      cursor: pointer;
+    }
+    .section {
+      background: #FFF;
+      border: 2px solid #151515;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-shadow: 2px 2px 0px #151515;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    .section-title {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 11px;
+    }
+    .pill {
+      background: #C6F36B;
+      color: #151515;
+      padding: 1px 4px;
+      border: 1px solid #151515;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    .input-field {
+      width: 100%;
+      border: 1px solid #151515;
+      padding: 6px;
+      font-family: monospace;
+      font-size: 11px;
+      margin-bottom: 6px;
+      background: #FAF9F6;
+    }
+    .btn {
+      width: 100%;
+      padding: 8px;
+      background: #151515;
+      color: #C6F36B;
+      border: 1px solid #151515;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 1px 1px 0px #151515;
+      margin-bottom: 4px;
+    }
+    .btn:active { transform: translate(1px, 1px); }
+    .btn-secondary {
+      background: #FAF9F6;
+      color: #151515;
+      border: 1px solid #151515;
+    }
+    .payee-item {
+      background: #FAF9F6;
+      border: 1px solid #DDD;
+      padding: 6px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+    }
+    .del-btn {
+      color: #D94F4F;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .privacy-tag {
+      background: #151515;
+      color: #FAF9F6;
+      padding: 6px;
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #151515;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span>🛡️</span>
+      <span>HEXFENCE GUARD</span>
+    </div>
+    <div class="lang-switcher">
+      <select id="popup-lang-select">
+        <option value="en">EN</option>
+        <option value="hi">HI</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Arkiv Snapshot Status -->
+  <div class="section">
+    <div class="section-title">
+      <span id="txt-snapshot-title">ARKIV SNAPSHOT</span>
+      <span id="snapshot-status" class="pill">SYNCED</span>
+    </div>
+    <div class="metric-row">
+      <span>Cached Entities:</span>
+      <strong id="entity-count">3 Incident Records</strong>
+    </div>
+    <button id="btn-sync-snapshot" class="btn btn-secondary">Sync Arkiv Snapshot</button>
+  </div>
+
+  <!-- Local Simulation Lab -->
+  <div class="section">
+    <div class="section-title">
+      <span id="txt-sim-title">LOCAL VERIFICATION LAB</span>
+    </div>
+    <input id="sim-address" class="input-field" type="text" placeholder="Paste test 0x recipient..." />
+    <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+      <button id="btn-preset-lookalike" class="btn btn-secondary" style="font-size: 9px; padding: 4px;">Preset Lookalike</button>
+      <button id="btn-preset-approved" class="btn btn-secondary" style="font-size: 9px; padding: 4px;">Preset Approved</button>
+      <button id="btn-preset-unknown" class="btn btn-secondary" style="font-size: 9px; padding: 4px;">Preset Unknown</button>
+    </div>
+    <button id="btn-simulate" class="btn">Simulate Transaction Check</button>
+  </div>
+
+  <!-- Approved Safe Payees List -->
+  <div class="section">
+    <div class="section-title">
+      <span id="txt-payees-title">APPROVED SAFE PAYEES</span>
+      <span id="payee-count" class="pill">2 Payees</span>
+    </div>
+    <div id="payees-list" style="max-height: 110px; overflow-y: auto;"></div>
+    <input id="new-payee-addr" class="input-field" type="text" placeholder="0x... payee address" style="margin-top: 6px;" />
+    <input id="new-payee-label" class="input-field" type="text" placeholder="Payee label (e.g. Treasury)" />
+    <button id="btn-add-payee" class="btn btn-secondary">+ Add Approved Payee</button>
+  </div>
+
+  <!-- Local Privacy Assurance Banner -->
+  <div class="privacy-tag">
+    <span>🔒</span>
+    <span>100% on-device matching. Recipient addresses are never sent to external servers.</span>
+  </div>
+
+  <script src="dist/ui/popup.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "@hexfence/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Solidity Smart Contracts and Gnosis Safe Guards for HexFence",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "e2e": "hardhat run scripts/e2e-pipeline.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.3"
+  }
+}
+

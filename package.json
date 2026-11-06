@@ -1,0 +1,33 @@
+{
+  "name": "hexfence-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HexFence — Enterprise-grade Ethereum Address-Poisoning Defense & Evidence Platform",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run --workspace=apps/web dev",
+    "dev:web": "npm run --workspace=apps/web dev",
+    "dev:explorer": "npm run --workspace=apps/explorer dev",
+    "dev:api": "npm run --workspace=services/api dev",
+    "dev:detector": "npm run --workspace=services/detector dev",
+    "build": "npm run --workspaces --if-present build",
+    "test": "npm run --workspaces --if-present test",
+    "e2e": "npm run --workspace=packages/contracts e2e",
+    "lint": "npm run --workspaces --if-present lint"
+  },
+  "keywords": [
+    "ethereum",
+    "security",
+    "address-poisoning",
+    "arkiv",
+    "safe-guard",
+    "browser-extension"
+  ],
+  "author": "HexFence Security Team",
+  "license": "MIT"
+}
+
